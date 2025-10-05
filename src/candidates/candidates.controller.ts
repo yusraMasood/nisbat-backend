@@ -17,8 +17,8 @@ export class CandidatesController {
   constructor(private readonly candidatesService: CandidatesService) {}
 
   @Get()
-  getCandidates(): Promise<Candidate[]> {
-    return this.candidatesService.getCandidates();
+  getCandidates(@CurrentUserId() userId: string): Promise<Candidate[]> {
+    return this.candidatesService.getCandidates(userId);
   }
   @Post()
   public async create(
@@ -31,18 +31,26 @@ export class CandidatesController {
     });
   }
   @Get(':id')
-  getCandidate(@Param('id') id: string): Promise<Candidate> {
-    return this.candidatesService.getCandidate(id);
+  getCandidate(
+    @Param('id') id: string,
+    @CurrentUserId() userId: string,
+  ): Promise<Candidate> {
+    return this.candidatesService.getCandidate(id, userId);
   }
   @Patch(':id')
   async update(
     @Param('id') id: string,
     @Body() updateCandidate: Partial<CreateCandidateDto>,
+    @CurrentUserId() userId: string,
   ): Promise<Candidate> {
-    return await this.candidatesService.update(id, updateCandidate);
+    console.log(updateCandidate);
+    return await this.candidatesService.update(id, updateCandidate, userId);
   }
   @Delete(':id')
-  async remove(@Param('id') id: string): Promise<void> {
-    return await this.candidatesService.remove(id);
+  async remove(
+    @Param('id') id: string,
+    @CurrentUserId() userId: string,
+  ): Promise<void> {
+    return await this.candidatesService.remove(id, userId);
   }
 }
