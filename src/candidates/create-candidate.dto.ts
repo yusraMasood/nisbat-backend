@@ -113,4 +113,6 @@ export class CreateCandidateDto {
   @IsOptional()
   @IsDateString()
   updatedAt?: string;
+
+  userId: string;
 }

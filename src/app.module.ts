@@ -8,12 +8,15 @@ import { typeOrmConfig } from './config/database.config';
 import { appConfigSchema } from './config/config.types';
 import { TypedConfigService } from './config/typed-config.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { User } from './users/user.entity';
+import { authConfig } from './config/auth.config';
+import { usersModule } from './users/users.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [typeOrmConfig],
+      load: [typeOrmConfig, authConfig],
       validationSchema: appConfigSchema,
       validationOptions: {
         abortEarly: true, //if theres any problem with environment variable it will make sure to throw an error
@@ -24,12 +27,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       inject: [ConfigService],
       useFactory: (configService: TypedConfigService) => ({
         ...configService.get('database'),
-        entities: [Candidate],
+        entities: [Candidate, User],
         autoLoadEntities: true,
       }),
     }),
 
     CandidatesModule,
+    usersModule,
   ],
   controllers: [AppController],
   providers: [
