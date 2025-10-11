@@ -4,6 +4,7 @@ import { User } from '../user.entity';
 import { PasswordService } from '../password/password.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from '../create-user.dto';
+import { Role } from '../role.enum';
 
 {
   /*
@@ -30,6 +31,7 @@ export class UserService {
     const user = this.userRepository.create({
       ...createUserDto,
       password: hashedPassword,
+      roles: [Role.USER],
     });
     return await this.userRepository.save(user);
   }

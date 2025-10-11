@@ -1,15 +1,30 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  app.useGlobalPipes(
-    new ValidationPipe({
-      transform: true, //The ValidationPipe can automatically transform payloads to be objects typed according to their DTO classes. To enable auto-transformation, set transform to true
-      whitelist: true, //If set to true, validator will strip validated (returned) object of any properties that do not use any validation decorators.
-    }),
-  );
-  await app.listen(process.env.PORT ?? 3000);
+	const app = await NestFactory.create(AppModule);
+
+	// Validation
+	app.useGlobalPipes(
+		new ValidationPipe({
+			transform: true,
+			whitelist: true,
+		}),
+	);
+
+	// Swagger Setup 🧩
+	const config = new DocumentBuilder()
+		.setTitle('Nisbat API Docs')
+		.setDescription('API documentation for the Nisbat backend')
+		.setVersion('1.0')
+		.addBearerAuth() // Adds Authorization: Bearer token support
+		.build();
+
+	const document = SwaggerModule.createDocument(app, config);
+	SwaggerModule.setup('api', app, document); // Route: http://localhost:3000/api
+
+	await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
