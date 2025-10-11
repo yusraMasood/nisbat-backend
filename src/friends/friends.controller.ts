@@ -40,6 +40,7 @@ export class FriendsController {
 
 	@Post('request/:receiverId')
 	@HttpCode(HttpStatus.CREATED)
+	@ApiBearerAuth()
 	@ApiOperation({
 		summary: 'Send friend request',
 		description:
@@ -74,6 +75,7 @@ export class FriendsController {
 
 	@Patch('accept/:id')
 	@HttpCode(HttpStatus.OK)
+	@ApiBearerAuth()
 	@ApiOperation({
 		summary: 'Accept friend request',
 		description: 'Accept a pending friend request sent to you.',
@@ -102,6 +104,7 @@ export class FriendsController {
 
 	@Patch('reject/:id')
 	@HttpCode(HttpStatus.OK)
+	@ApiBearerAuth()
 	@ApiOperation({
 		summary: 'Reject friend request',
 		description: 'Reject a pending friend request sent to you.',
@@ -130,6 +133,7 @@ export class FriendsController {
 
 	@Delete('cancel/:id')
 	@HttpCode(HttpStatus.NO_CONTENT)
+	@ApiBearerAuth()
 	@ApiOperation({
 		summary: 'Cancel friend request',
 		description: 'Cancel a friend request you sent that is still pending.',
@@ -157,6 +161,7 @@ export class FriendsController {
 
 	@Get()
 	@HttpCode(HttpStatus.OK)
+	@ApiBearerAuth()
 	@ApiOperation({
 		summary: 'Get friends list',
 		description: 'Get list of all accepted friends for the current user.',
@@ -174,6 +179,7 @@ export class FriendsController {
 
 	@Get('pending')
 	@HttpCode(HttpStatus.OK)
+	@ApiBearerAuth()
 	@ApiOperation({
 		summary: 'Get pending friend requests',
 		description:
@@ -192,6 +198,7 @@ export class FriendsController {
 
 	@Get('sent')
 	@HttpCode(HttpStatus.OK)
+	@ApiBearerAuth()
 	@ApiOperation({
 		summary: 'Get sent friend requests',
 		description:
@@ -210,6 +217,7 @@ export class FriendsController {
 
 	@Get('blocked')
 	@HttpCode(HttpStatus.OK)
+	@ApiBearerAuth()
 	@ApiOperation({
 		summary: 'Get blocked users',
 		description: 'Get list of users you have blocked.',
@@ -227,6 +235,7 @@ export class FriendsController {
 
 	@Patch('block/:targetId')
 	@HttpCode(HttpStatus.OK)
+	@ApiBearerAuth()
 	@ApiOperation({
 		summary: 'Block user',
 		description:
@@ -253,6 +262,7 @@ export class FriendsController {
 
 	@Delete('unblock/:targetId')
 	@HttpCode(HttpStatus.NO_CONTENT)
+	@ApiBearerAuth()
 	@ApiOperation({
 		summary: 'Unblock user',
 		description:
@@ -277,6 +287,7 @@ export class FriendsController {
 
 	@Delete('remove/:targetId')
 	@HttpCode(HttpStatus.NO_CONTENT)
+	@ApiBearerAuth()
 	@ApiOperation({
 		summary: 'Remove friend',
 		description:
