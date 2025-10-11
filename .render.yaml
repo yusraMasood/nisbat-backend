@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: nisbat-backend
+    env: node
+    plan: free
+    buildCommand: yarn install && yarn build
+    startCommand: yarn start:prod
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_DATABASE
+        sync: false
+      - key: DB_SYNC
+        value: "1"
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_EXPIRES_IN
+        value: "24h"
