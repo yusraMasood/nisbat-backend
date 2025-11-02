@@ -17,7 +17,12 @@ async function bootstrap() {
 	// Swagger Setup 🧩
 	const config = new DocumentBuilder()
 		.setTitle('Nisbat API Docs')
-		.setDescription('API documentation for the Nisbat backend')
+		.setDescription(
+			'API documentation for the Nisbat backend\n\n' +
+			'🔐 Authentication: Click "Authorize" and enter your JWT token\n' +
+			'💬 Chat: REST API endpoints + WebSocket support for real-time messaging\n' +
+			'📖 See SWAGGER_CHAT_GUIDE.md for detailed chat documentation',
+		)
 		.setVersion('1.0')
 		.addBearerAuth() // Adds Authorization: Bearer token support
 		.build();

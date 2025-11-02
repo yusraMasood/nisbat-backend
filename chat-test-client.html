@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat System Test Client</title>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .container {
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        input, button {
+            padding: 10px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        #messages {
+            border: 1px solid #ddd;
+            padding: 10px;
+            height: 300px;
+            overflow-y: scroll;
+            margin: 10px 0;
+            background: #f9f9f9;
+        }
+        .message {
+            padding: 5px;
+            margin: 5px 0;
+            border-radius: 4px;
+        }
+        .message.sent {
+            background: #d1ecf1;
+            text-align: right;
+        }
+        .message.received {
+            background: #fff3cd;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .status.connected {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status.disconnected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Chat System Test Client</h1>
+        
+        <div id="status" class="status disconnected">Disconnected</div>
+        
+        <h3>Connection</h3>
+        <input type="text" id="serverUrl" placeholder="Server URL" value="http://localhost:3000">
+        <input type="text" id="jwtToken" placeholder="JWT Token" style="width: 400px;">
+        <button onclick="connect()">Connect</button>
+        <button onclick="disconnect()">Disconnect</button>
+        
+        <h3>Messages</h3>
+        <div id="messages"></div>
+        
+        <h3>Send Message</h3>
+        <input type="text" id="receiverId" placeholder="Receiver User ID">
+        <input type="text" id="messageContent" placeholder="Message content" style="width: 300px;">
+        <button onclick="sendMessage()">Send</button>
+        
+        <h3>Get Messages</h3>
+        <input type="text" id="otherUserId" placeholder="Other User ID">
+        <button onclick="getMessages()">Load Conversation</button>
+    </div>
+
+    <script>
+        let socket = null;
+        let currentUserId = null;
+
+        function updateStatus(connected) {
+            const statusEl = document.getElementById('status');
+            if (connected) {
+                statusEl.className = 'status connected';
+                statusEl.textContent = '✓ Connected';
+            } else {
+                statusEl.className = 'status disconnected';
+                statusEl.textContent = '✗ Disconnected';
+            }
+        }
+
+        function addMessage(message, type = 'received') {
+            const messagesEl = document.getElementById('messages');
+            const messageEl = document.createElement('div');
+            messageEl.className = `message ${type}`;
+            
+            const time = new Date(message.createdAt).toLocaleTimeString();
+            messageEl.innerHTML = `
+                <strong>${message.senderName}:</strong> ${message.content}
+                <br><small>${time}</small>
+            `;
+            
+            messagesEl.appendChild(messageEl);
+            messagesEl.scrollTop = messagesEl.scrollHeight;
+        }
+
+        function addSystemMessage(text) {
+            const messagesEl = document.getElementById('messages');
+            const messageEl = document.createElement('div');
+            messageEl.className = 'message';
+            messageEl.style.background = '#e2e3e5';
+            messageEl.innerHTML = `<em>${text}</em>`;
+            messagesEl.appendChild(messageEl);
+            messagesEl.scrollTop = messagesEl.scrollHeight;
+        }
+
+        function connect() {
+            const serverUrl = document.getElementById('serverUrl').value;
+            const jwtToken = document.getElementById('jwtToken').value;
+
+            if (!jwtToken) {
+                alert('Please enter a JWT token');
+                return;
+            }
+
+            // Disconnect existing connection
+            if (socket) {
+                socket.disconnect();
+            }
+
+            // Create new connection
+            socket = io(serverUrl, {
+                auth: {
+                    token: jwtToken
+                }
+            });
+
+            // Connection events
+            socket.on('connect', () => {
+                console.log('Connected to server');
+                updateStatus(true);
+                addSystemMessage('Connected to server');
+            });
+
+            socket.on('disconnect', () => {
+                console.log('Disconnected from server');
+                updateStatus(false);
+                addSystemMessage('Disconnected from server');
+            });
+
+            // Message events
+            socket.on('receive_message', (message) => {
+                console.log('Received message:', message);
+                
+                // Determine if this is a sent or received message
+                const type = message.senderId === currentUserId ? 'sent' : 'received';
+                addMessage(message, type);
+            });
+
+            socket.on('messages_list', (messages) => {
+                console.log('Received messages list:', messages);
+                document.getElementById('messages').innerHTML = '';
+                messages.forEach(msg => {
+                    const type = msg.senderId === currentUserId ? 'sent' : 'received';
+                    addMessage(msg, type);
+                });
+            });
+
+            socket.on('error', (error) => {
+                console.error('Socket error:', error);
+                addSystemMessage(`Error: ${error.message}`);
+            });
+
+            // Decode JWT to get user ID (basic decode, not verification)
+            try {
+                const payload = JSON.parse(atob(jwtToken.split('.')[1]));
+                currentUserId = payload.sub;
+                console.log('Current user ID:', currentUserId);
+            } catch (e) {
+                console.error('Failed to decode JWT:', e);
+            }
+        }
+
+        function disconnect() {
+            if (socket) {
+                socket.disconnect();
+                socket = null;
+                updateStatus(false);
+            }
+        }
+
+        function sendMessage() {
+            if (!socket || !socket.connected) {
+                alert('Not connected to server');
+                return;
+            }
+
+            const receiverId = document.getElementById('receiverId').value;
+            const content = document.getElementById('messageContent').value;
+
+            if (!receiverId || !content) {
+                alert('Please enter receiver ID and message content');
+                return;
+            }
+
+            socket.emit('send_message', {
+                receiverId: receiverId,
+                content: content
+            });
+
+            // Clear input
+            document.getElementById('messageContent').value = '';
+        }
+
+        function getMessages() {
+            if (!socket || !socket.connected) {
+                alert('Not connected to server');
+                return;
+            }
+
+            const otherUserId = document.getElementById('otherUserId').value;
+
+            if (!otherUserId) {
+                alert('Please enter other user ID');
+                return;
+            }
+
+            socket.emit('get_messages', {
+                otherUserId: otherUserId
+            });
+        }
+
+        // Allow Enter key to send message
+        document.getElementById('messageContent').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>
+

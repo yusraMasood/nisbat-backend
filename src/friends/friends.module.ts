@@ -10,21 +10,21 @@ import { AuthConfig } from '../config/auth.config';
 import { TypedConfigService } from '../config/typed-config.service';
 
 @Module({
-	imports: [
-		TypeOrmModule.forFeature([Friend, User]),
-		JwtModule.registerAsync({
-			imports: [ConfigModule],
-			inject: [ConfigService],
-			useFactory: (config: TypedConfigService) => ({
-				secret: config.get<AuthConfig>('auth')?.jwt.secret,
-				signOptions: {
-					expiresIn: config.get<AuthConfig>('auth')?.jwt.expiresIn,
-				},
-			}),
-		}),
-	],
-	controllers: [FriendsController],
-	providers: [FriendsService],
-	exports: [FriendsService],
+  imports: [
+    TypeOrmModule.forFeature([Friend, User]),
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: TypedConfigService) => ({
+        secret: config.get<AuthConfig>('auth')?.jwt.secret,
+        signOptions: {
+          expiresIn: config.get<AuthConfig>('auth')?.jwt.expiresIn,
+        },
+      }),
+    }),
+  ],
+  controllers: [FriendsController],
+  providers: [FriendsService],
+  exports: [FriendsService],
 })
-export class FriendsModule { }
+export class FriendsModule {}

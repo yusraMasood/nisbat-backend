@@ -13,38 +13,41 @@ import { authConfig } from './config/auth.config';
 import { usersModule } from './users/users.module';
 import { FriendsModule } from './friends/friends.module';
 import { Friend } from './friends/friend.entity';
+import { ChatModule } from './chat/chat.module';
+import { Message } from './chat/message.entity';
 
 @Module({
-	imports: [
-		ConfigModule.forRoot({
-			isGlobal: true,
-			load: [typeOrmConfig, authConfig],
-			validationSchema: appConfigSchema,
-			validationOptions: {
-				abortEarly: true, //if theres any problem with environment variable it will make sure to throw an error
-			},
-		}),
-		TypeOrmModule.forRootAsync({
-			imports: [ConfigModule],
-			inject: [ConfigService],
-			useFactory: (configService: TypedConfigService) => ({
-				...configService.get('database'),
-				entities: [Candidate, User, Friend],
-				autoLoadEntities: true,
-			}),
-		}),
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [typeOrmConfig, authConfig],
+      validationSchema: appConfigSchema,
+      validationOptions: {
+        abortEarly: true, //if theres any problem with environment variable it will make sure to throw an error
+      },
+    }),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: TypedConfigService) => ({
+        ...configService.get('database'),
+        entities: [Candidate, User, Friend, Message],
+        autoLoadEntities: true,
+      }),
+    }),
 
-		CandidatesModule,
-		usersModule,
-		FriendsModule,
-	],
-	controllers: [AppController],
-	providers: [
-		AppService,
-		{
-			provide: TypedConfigService,
-			useExisting: ConfigService,
-		},
-	],
+    CandidatesModule,
+    usersModule,
+    FriendsModule,
+    ChatModule,
+  ],
+  controllers: [AppController],
+  providers: [
+    AppService,
+    {
+      provide: TypedConfigService,
+      useExisting: ConfigService,
+    },
+  ],
 })
-export class AppModule { }
+export class AppModule {}
