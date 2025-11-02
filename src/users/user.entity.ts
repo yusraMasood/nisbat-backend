@@ -1,70 +1,111 @@
 import { Expose } from 'class-transformer';
 import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  OneToMany,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
+	Column,
+	CreateDateColumn,
+	Entity,
+	OneToMany,
+	PrimaryGeneratedColumn,
+	UpdateDateColumn,
 } from 'typeorm';
-import { Role, UserRole } from './role.enum';
+import { Role } from './role.enum';
 import { Candidate } from '../candidates/candidate.entity';
 import { Friend } from '../friends/friend.entity';
 import { Message } from '../chat/message.entity';
 
 @Entity()
 export class User {
-  @PrimaryGeneratedColumn('uuid')
-  @Expose()
-  id: string;
+	@PrimaryGeneratedColumn('uuid')
+	@Expose()
+	id: string;
 
-  @Column()
-  @Expose()
-  name: string;
+	@Column()
+	@Expose()
+	name: string;
 
-  @Column()
-  @Expose()
-  email: string;
+	@Column()
+	@Expose()
+	email: string;
 
-  @Column()
-  password: string;
+	@Column()
+	@Expose()
+	phoneNumber: string;
 
-  @CreateDateColumn()
-  @Expose()
-  createdAt: Date;
+	@Column({ nullable: true })
+	@Expose()
+	fullName?: string;
 
-  @UpdateDateColumn()
-  @Expose()
-  updatedAt: Date;
+	@Column({ nullable: true })
+	@Expose()
+	phone?: string;
 
-  @OneToMany(() => Candidate, (candidate) => candidate.user)
-  @Expose()
-  candidates: Candidate[];
+	@Column({ type: 'text', nullable: true })
+	@Expose()
+	profileImage?: string | null;
 
-  @OneToMany(() => Friend, (friend) => friend.sender)
-  @Expose()
-  sentFriendRequests: Friend[];
+	@Column({ nullable: true })
+	@Expose()
+	religion?: string;
 
-  @OneToMany(() => Friend, (friend) => friend.receiver)
-  @Expose()
-  receivedFriendRequests: Friend[];
+	@Column({ nullable: true })
+	@Expose()
+	subReligion?: string;
 
-  @OneToMany(() => Message, (message: Message) => message.sender)
-  @Expose()
-  sentMessages: Message[];
+	@Column({ nullable: true })
+	@Expose()
+	languages?: string;
 
-  @OneToMany(() => Message, (message: Message) => message.receiver)
-  @Expose()
-  receivedMessages: Message[];
+	@Column({ nullable: true })
+	@Expose()
+	caste?: string;
 
-  @Column('text', { array: true, default: [Role.USER] })
-  @Expose()
-  roles: Role[];
+	@Column({ nullable: true })
+	@Expose()
+	gender?: string;
 
-  @Column({
-    type: 'enum',
-    enum: UserRole,
-  })
-  @Expose()
-  userRole: UserRole;
+	@Column({ nullable: true })
+	@Expose()
+	city?: string;
+
+	@Column({ nullable: true })
+	@Expose()
+	country?: string;
+
+	@Column({ nullable: true })
+	@Expose()
+	contactMethod?: string;
+
+	@Column()
+	password: string;
+
+	@CreateDateColumn()
+	@Expose()
+	createdAt: Date;
+
+	@UpdateDateColumn()
+	@Expose()
+	updatedAt: Date;
+
+	@OneToMany(() => Candidate, (candidate) => candidate.user)
+	@Expose()
+	candidates: Candidate[];
+
+	@OneToMany(() => Friend, (friend) => friend.sender)
+	@Expose()
+	sentFriendRequests: Friend[];
+
+	@OneToMany(() => Friend, (friend) => friend.receiver)
+	@Expose()
+	receivedFriendRequests: Friend[];
+
+	@OneToMany(() => Message, (message: Message) => message.sender)
+	@Expose()
+	sentMessages: Message[];
+
+	@OneToMany(() => Message, (message: Message) => message.receiver)
+	@Expose()
+	receivedMessages: Message[];
+
+	@Column('text', { array: true, default: [Role.USER] })
+	@Expose()
+	roles: Role[];
 }

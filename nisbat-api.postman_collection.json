@@ -1,0 +1,778 @@
+{
+	"info": {
+		"name": "Nisbat API",
+		"description": "Complete API collection for Nisbat backend",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "nisbat-backend"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3000",
+			"type": "string"
+		},
+		{
+			"key": "authToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "userId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "candidateId",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"yusra\",\n  \"email\": \"yusra@gmail.com\",\n  \"phoneNumber\": \"3032900445\",\n  \"password\": \"Admin@123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/register",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "register"]
+						},
+						"description": "Register a new user. Default role is USER."
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.accessToken) {",
+									"        pm.collectionVariables.set('authToken', jsonData.accessToken);",
+									"        pm.collectionVariables.set('userId', jsonData.user?.id || '');",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"yusra@gmail.com\",\n  \"password\": \"Admin@123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "login"]
+						},
+						"description": "Login and get JWT token. Token is automatically saved."
+					},
+					"response": []
+				},
+				{
+					"name": "Forgot Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"yusra@gmail.com\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/forgot-password",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "forgot-password"]
+						},
+						"description": "Request password reset link"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Profile (Auth)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/profile",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "profile"]
+						},
+						"description": "Get current user profile from auth endpoint"
+					},
+					"response": []
+				},
+				{
+					"name": "Admin Only",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/admin",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "admin"]
+						},
+						"description": "Admin only endpoint"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Get Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/users/profile",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "users", "profile"]
+						},
+						"description": "Get current user's profile"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Profile",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"fullName\": \"Yusra Masood\",\n  \"profileImage\": \"https://example.com/image.jpg\",\n  \"religion\": \"Islam\",\n  \"subReligion\": \"Sunni\",\n  \"languages\": \"Urdu, English\",\n  \"caste\": \"Example Caste\",\n  \"gender\": \"Female\",\n  \"city\": \"Lahore\",\n  \"country\": \"Pakistan\",\n  \"contactMethod\": \"phone\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users/profile",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "users", "profile"]
+						},
+						"description": "Update user profile. All fields are optional."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Candidates",
+			"item": [
+				{
+					"name": "Get Home (All Except Self)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/candidates/home",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "candidates", "home"]
+						},
+						"description": "Get all candidates except current user's candidates"
+					},
+					"response": []
+				},
+				{
+					"name": "Get My Candidates",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/candidates",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "candidates"]
+						},
+						"description": "Get all candidates created by current user"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Candidate",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201 || pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.id) {",
+									"        pm.collectionVariables.set('candidateId', jsonData.id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"fullName\": \"John Doe\",\n  \"image\": \"https://example.com/profile.jpg\",\n  \"gender\": \"Male\",\n  \"dob\": \"1990-01-15\",\n  \"maritalStatus\": \"Single\",\n  \"height\": \"5'10\\\"\",\n  \"religion\": \"Islam\",\n  \"caste\": \"Example Caste\",\n  \"language\": \"Urdu\",\n  \"education\": \"Bachelor's Degree\",\n  \"job\": \"Software Engineer\",\n  \"income\": \"50000-100000\",\n  \"preferredAge\": \"25-30\",\n  \"preferredHeight\": \"5'5\\\"-6'0\\\"\",\n  \"preferredEducation\": \"Bachelor's or higher\",\n  \"preferredCaste\": \"Any\",\n  \"preferredLanguage\": \"Urdu, English\",\n  \"preferredLocation\": \"Lahore, Karachi\",\n  \"otherPreferred\": \"Non-smoker, active lifestyle\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/candidates",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "candidates"]
+						},
+						"description": "Create a new candidate"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Candidate by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/candidates/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "candidates", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{candidateId}}",
+									"description": "Candidate UUID"
+								}
+							]
+						},
+						"description": "Get candidate by ID (must be owned by current user)"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Candidate",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"fullName\": \"John Doe Updated\",\n  \"status\": \"APPROVED\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/candidates/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "candidates", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{candidateId}}",
+									"description": "Candidate UUID"
+								}
+							]
+						},
+						"description": "Update candidate (must be owned by current user)"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Candidate",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/candidates/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "candidates", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{candidateId}}",
+									"description": "Candidate UUID"
+								}
+							]
+						},
+						"description": "Delete candidate (must be owned by current user)"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Friends",
+			"item": [
+				{
+					"name": "Send Friend Request",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/friends/request/:receiverId",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "friends", "request", ":receiverId"],
+							"variable": [
+								{
+									"key": "receiverId",
+									"value": "123e4567-e89b-12d3-a456-426614174000",
+									"description": "UUID of user to send friend request to"
+								}
+							]
+						},
+						"description": "Send a friend request to another user"
+					},
+					"response": []
+				},
+				{
+					"name": "Accept Friend Request",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/friends/accept/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "friends", "accept", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "123e4567-e89b-12d3-a456-426614174000",
+									"description": "UUID of friend request"
+								}
+							]
+						},
+						"description": "Accept a pending friend request"
+					},
+					"response": []
+				},
+				{
+					"name": "Reject Friend Request",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/friends/reject/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "friends", "reject", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "123e4567-e89b-12d3-a456-426614174000",
+									"description": "UUID of friend request"
+								}
+							]
+						},
+						"description": "Reject a pending friend request"
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel Friend Request",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/friends/cancel/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "friends", "cancel", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "123e4567-e89b-12d3-a456-426614174000",
+									"description": "UUID of friend request"
+								}
+							]
+						},
+						"description": "Cancel a friend request you sent"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Friends",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/friends",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "friends"]
+						},
+						"description": "Get list of all accepted friends"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Pending Requests",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/friends/pending",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "friends", "pending"]
+						},
+						"description": "Get friend requests sent to you (pending)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Sent Requests",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/friends/sent",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "friends", "sent"]
+						},
+						"description": "Get friend requests you sent (pending)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Blocked Users",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/friends/blocked",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "friends", "blocked"]
+						},
+						"description": "Get list of blocked users"
+					},
+					"response": []
+				},
+				{
+					"name": "Block User",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/friends/block/:targetId",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "friends", "block", ":targetId"],
+							"variable": [
+								{
+									"key": "targetId",
+									"value": "123e4567-e89b-12d3-a456-426614174000",
+									"description": "UUID of user to block"
+								}
+							]
+						},
+						"description": "Block a user"
+					},
+					"response": []
+				},
+				{
+					"name": "Unblock User",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/friends/unblock/:targetId",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "friends", "unblock", ":targetId"],
+							"variable": [
+								{
+									"key": "targetId",
+									"value": "123e4567-e89b-12d3-a456-426614174000",
+									"description": "UUID of user to unblock"
+								}
+							]
+						},
+						"description": "Unblock a previously blocked user"
+					},
+					"response": []
+				},
+				{
+					"name": "Remove Friend",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/friends/remove/:targetId",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "friends", "remove", ":targetId"],
+							"variable": [
+								{
+									"key": "targetId",
+									"value": "123e4567-e89b-12d3-a456-426614174000",
+									"description": "UUID of friend to remove"
+								}
+							]
+						},
+						"description": "Remove a friend from your friends list"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Chat",
+			"item": [
+				{
+					"name": "Send Message",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"receiverId\": \"123e4567-e89b-12d3-a456-426614174000\",\n  \"content\": \"Hello, how are you?\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/chat/messages",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "chat", "messages"]
+						},
+						"description": "Send a message to another user via REST API"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Messages",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/chat/messages/:otherUserId",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "chat", "messages", ":otherUserId"],
+							"variable": [
+								{
+									"key": "otherUserId",
+									"value": "123e4567-e89b-12d3-a456-426614174000",
+									"description": "UUID of the other user"
+								}
+							]
+						},
+						"description": "Get all messages between current user and another user"
+					},
+					"response": []
+				},
+				{
+					"name": "Get WebSocket Info",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/chat/info",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "chat", "info"]
+						},
+						"description": "Get WebSocket connection information for real-time chat"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "App",
+			"item": [
+				{
+					"name": "Hello",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api",
+							"host": ["{{baseUrl}}"],
+							"path": ["api"]
+						},
+						"description": "Public hello endpoint"
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{authToken}}",
+				"type": "string"
+			}
+		]
+	}
+}
+

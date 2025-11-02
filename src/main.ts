@@ -6,6 +6,9 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
 
+	// Set global prefix for all API routes
+	app.setGlobalPrefix('api');
+
 	// Validation
 	app.useGlobalPipes(
 		new ValidationPipe({
@@ -16,20 +19,20 @@ async function bootstrap() {
 
 	// Swagger Setup 🧩
 	const config = new DocumentBuilder()
-		.setTitle('Nisbat API Docs')
-		.setDescription(
-			'API documentation for the Nisbat backend\n\n' +
-			'🔐 Authentication: Click "Authorize" and enter your JWT token\n' +
-			'💬 Chat: REST API endpoints + WebSocket support for real-time messaging\n' +
-			'📖 See SWAGGER_CHAT_GUIDE.md for detailed chat documentation',
-		)
+		.setTitle('Nisbat API')
+		.setDescription('Nisbat backend API documentation')
 		.setVersion('1.0')
 		.addBearerAuth() // Adds Authorization: Bearer token support
 		.build();
 
 	const document = SwaggerModule.createDocument(app, config);
-	SwaggerModule.setup('api', app, document); // Route: http://localhost:3000/api
+	SwaggerModule.setup('api/docs', app, document); // Route: http://localhost:3000/api/docs
 
-	await app.listen(process.env.PORT ?? 3000);
+	const port = process.env.PORT ?? 3000;
+	await app.listen(port);
+	console.log(`🚀 Server running at: http://localhost:${port}/api`);
+	console.log(
+		`📘 Swagger docs available at: http://localhost:${port}/api/docs`,
+	);
 }
 bootstrap();
