@@ -12,7 +12,7 @@ import { Candidate } from '../candidates/candidate.entity';
 import { Friend } from '../friends/friend.entity';
 import { Message } from '../chat/message.entity';
 
-@Entity()
+@Entity('users')
 export class User {
 	@PrimaryGeneratedColumn('uuid')
 	@Expose()

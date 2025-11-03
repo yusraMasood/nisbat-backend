@@ -26,7 +26,7 @@ async function bootstrap() {
 		.build();
 
 	const document = SwaggerModule.createDocument(app, config);
-	SwaggerModule.setup('api/docs', app, document); // Route: http://localhost:3000/api/docs
+	SwaggerModule.setup('docs', app, document); // Will be available at /api/docs due to global prefix
 
 	const port = process.env.PORT ?? 3000;
 	await app.listen(port);
