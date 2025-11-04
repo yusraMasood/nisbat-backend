@@ -24,10 +24,10 @@ export class CandidatesController {
 
 	@Get('home')
 	@UseGuards(AuthGuard)
-	async getAllCandidatesExceptSelf(
+	async getHomeFeed(
 		@Req() req: AuthRequest,
 	): Promise<Candidate[]> {
-		return this.candidatesService.findAllExceptUser(req.user.sub);
+		return this.candidatesService.getHomeFeed(req.user.sub);
 	}
 
 	@Get()

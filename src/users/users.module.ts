@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './user.entity';
+import { Friend } from '../friends/friend.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthConfig } from '../config/auth.config';
@@ -16,7 +17,7 @@ import { RolesGuard } from './roles.guard';
 
 @Module({
 	imports: [
-		TypeOrmModule.forFeature([User]),
+		TypeOrmModule.forFeature([User, Friend]),
 		JwtModule.registerAsync({
 			imports: [ConfigModule],
 			inject: [ConfigService],

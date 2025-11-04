@@ -15,7 +15,6 @@ import { User } from './user.entity';
 import type { AuthRequest } from './auth.request';
 import { UpdateProfileDto } from './update-profile.dto';
 import { AuthGuard } from './auth.guard';
-import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('users')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -25,7 +24,6 @@ export class UsersController {
 	constructor(private readonly userService: UserService) { }
 
 	@Get('profile')
-	@ApiBearerAuth()
 	async getProfile(@Request() request: AuthRequest): Promise<User> {
 		const user = await this.userService.findOneById(request.user.sub);
 		if (!user) {
@@ -35,7 +33,6 @@ export class UsersController {
 	}
 
 	@Patch('profile')
-	@ApiBearerAuth()
 	async updateProfile(
 		@Request() request: AuthRequest,
 		@Body() updateProfileDto: UpdateProfileDto,
@@ -44,6 +41,11 @@ export class UsersController {
 			request.user.sub,
 			updateProfileDto,
 		);
+	}
+
+	@Get('suggestions')
+	async getSuggestions(@Request() request: AuthRequest): Promise<User[]> {
+		return this.userService.getSuggestions(request.user.sub);
 	}
 }
 

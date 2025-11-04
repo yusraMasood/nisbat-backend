@@ -118,26 +118,6 @@
 					"response": []
 				},
 				{
-					"name": "Get Profile (Auth)",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{authToken}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/auth/profile",
-							"host": ["{{baseUrl}}"],
-							"path": ["api", "auth", "profile"]
-						},
-						"description": "Get current user profile from auth endpoint"
-					},
-					"response": []
-				},
-				{
 					"name": "Admin Only",
 					"request": {
 						"method": "GET",
@@ -209,6 +189,26 @@
 						"description": "Update user profile. All fields are optional."
 					},
 					"response": []
+				},
+				{
+					"name": "Get Suggestions",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/users/suggestions",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "users", "suggestions"]
+						},
+						"description": "Get list of people you can connect with (not your friends, not yourself)"
+					},
+					"response": []
 				}
 			]
 		},
@@ -216,7 +216,7 @@
 			"name": "Candidates",
 			"item": [
 				{
-					"name": "Get Home (All Except Self)",
+					"name": "Get Home Feed",
 					"request": {
 						"method": "GET",
 						"header": [
@@ -231,7 +231,7 @@
 							"host": ["{{baseUrl}}"],
 							"path": ["api", "candidates", "home"]
 						},
-						"description": "Get all candidates except current user's candidates"
+						"description": "Get home feed - candidates from your friends only (ordered by newest first)"
 					},
 					"response": []
 				},
