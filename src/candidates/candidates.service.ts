@@ -22,8 +22,10 @@ export class CandidatesService {
 	public async getCandidates(userId: string): Promise<Candidate[]> {
 		return await this.candidateRepository.find({ where: { userId } });
 	}
-	public async create(createTaskDto: CreateCandidateDto): Promise<Candidate> {
-		return await this.candidateRepository.save(createTaskDto);
+	public async create(
+		createCandidateDto: CreateCandidateDto & { userId: string },
+	): Promise<Candidate> {
+		return await this.candidateRepository.save(createCandidateDto);
 	}
 	async getCandidate(id: string, userId: string): Promise<Candidate> {
 		const candidate = await this.candidateRepository.findOne({ where: { id } });

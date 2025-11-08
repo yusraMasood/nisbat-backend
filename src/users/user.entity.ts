@@ -12,6 +12,8 @@ import { Candidate } from '../candidates/candidate.entity';
 import { Friend } from '../friends/friend.entity';
 import { Message } from '../chat/message.entity';
 
+export type SuggestionStatus = 'none' | 'pending' | 'requested';
+
 @Entity('users')
 export class User {
 	@PrimaryGeneratedColumn('uuid')
@@ -108,4 +110,7 @@ export class User {
 	@Column('text', { array: true, default: [Role.USER] })
 	@Expose()
 	roles: Role[];
+
+	@Expose({ groups: ['suggestions'] })
+	status?: SuggestionStatus;
 }

@@ -37,15 +37,12 @@ export class UsersController {
 		@Request() request: AuthRequest,
 		@Body() updateProfileDto: UpdateProfileDto,
 	): Promise<User> {
-		return this.userService.updateProfile(
-			request.user.sub,
-			updateProfileDto,
-		);
+		return this.userService.updateProfile(request.user.sub, updateProfileDto);
 	}
 
 	@Get('suggestions')
+	@SerializeOptions({ groups: ['suggestions'], strategy: 'excludeAll' })
 	async getSuggestions(@Request() request: AuthRequest): Promise<User[]> {
 		return this.userService.getSuggestions(request.user.sub);
 	}
 }
-

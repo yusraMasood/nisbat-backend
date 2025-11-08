@@ -10,8 +10,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from '../create-user.dto';
 import { UpdateProfileDto } from '../update-profile.dto';
 import { Role } from '../role.enum';
-import { Friend } from '../../friends/friend.entity';
-import { FriendStatus } from '../../friends/friend.entity';
+import { Friend, FriendStatus } from '../../friends/friend.entity';
 
 {
 	/*
@@ -79,46 +78,40 @@ export class UserService {
 	}
 
 	async getSuggestions(userId: string): Promise<User[]> {
-		// Get all accepted friends (both as sender and receiver)
-		const friends = await this.friendRepository.find({
-			where: [
-				{ senderId: userId, status: FriendStatus.ACCEPTED },
-				{ receiverId: userId, status: FriendStatus.ACCEPTED },
-			],
+		const relationships = await this.friendRepository.find({
+			where: [{ senderId: userId }, { receiverId: userId }],
+			select: ['senderId', 'receiverId', 'status'],
 		});
 
-		// Extract friend IDs (both sender and receiver)
-		const friendIds = new Set<string>();
-		friendIds.add(userId); // Exclude current user
+		const excludedUserIds = new Set<string>([userId]);
+		const statusMap = new Map<string, 'pending' | 'requested'>();
 
-		friends.forEach((friend) => {
-			if (friend.senderId === userId) {
-				friendIds.add(friend.receiverId);
-			} else {
-				friendIds.add(friend.senderId);
+		for (const relationship of relationships) {
+			const otherUserId =
+				relationship.senderId === userId
+					? relationship.receiverId
+					: relationship.senderId;
+
+			switch (relationship.status) {
+				case FriendStatus.ACCEPTED:
+				case FriendStatus.BLOCKED:
+					excludedUserIds.add(otherUserId);
+					break;
+				case FriendStatus.PENDING:
+					if (relationship.senderId === userId) {
+						statusMap.set(otherUserId, 'pending');
+					} else if (relationship.receiverId === userId) {
+						statusMap.set(otherUserId, 'requested');
+					}
+					break;
+				default:
+					break;
 			}
-		});
+		}
 
-		// Get all blocked users (should also be excluded)
-		const blockedFriends = await this.friendRepository.find({
-			where: [
-				{ senderId: userId, status: FriendStatus.BLOCKED },
-				{ receiverId: userId, status: FriendStatus.BLOCKED },
-			],
-		});
-
-		blockedFriends.forEach((friend) => {
-			if (friend.senderId === userId) {
-				friendIds.add(friend.receiverId);
-			} else {
-				friendIds.add(friend.senderId);
-			}
-		});
-
-		// Get users who are not friends and not blocked
-		return this.userRepository.find({
+		const suggestionUsers = await this.userRepository.find({
 			where: {
-				id: Not(In(Array.from(friendIds))),
+				id: Not(In(Array.from(excludedUserIds))),
 			},
 			select: [
 				'id',
@@ -133,6 +126,12 @@ export class UserService {
 				'caste',
 				'languages',
 			],
+		});
+
+		return suggestionUsers.map((partialUser) => {
+			const suggestion = this.userRepository.create(partialUser);
+			suggestion.status = statusMap.get(suggestion.id) ?? 'none';
+			return suggestion;
 		});
 	}
 }
