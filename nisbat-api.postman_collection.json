@@ -405,12 +405,12 @@
 							}
 						],
 						"url": {
-							"raw": "{{baseUrl}}/api/friends/request/:receiverId",
+							"raw": "{{baseUrl}}/api/friends/request/:userId",
 							"host": ["{{baseUrl}}"],
-							"path": ["api", "friends", "request", ":receiverId"],
+							"path": ["api", "friends", "request", ":userId"],
 							"variable": [
 								{
-									"key": "receiverId",
+									"key": "userId",
 									"value": "123e4567-e89b-12d3-a456-426614174000",
 									"description": "UUID of user to send friend request to"
 								}

@@ -6,10 +6,10 @@ import {
 	ForbiddenException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, In } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Friend, FriendStatus } from './friend.entity';
 import { User } from '../users/user.entity';
-import { CreateFriendDto, FriendResponseDto } from './create-friend.dto';
+import { FriendResponseDto } from './create-friend.dto';
 
 @Injectable()
 export class FriendsService {
