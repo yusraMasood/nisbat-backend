@@ -36,10 +36,6 @@ export class CreateCandidateDto {
 	@IsNotEmpty()
 	fullName: string;
 
-	@IsOptional()
-	@IsString()
-	image?: string;
-
 	@IsEnum(Gender)
 	gender: Gender;
 

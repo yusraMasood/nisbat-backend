@@ -10,6 +10,7 @@ import { Candidate } from './candidate.entity';
 import { Repository, Not, In } from 'typeorm';
 import { Friend } from '../friends/friend.entity';
 import { FriendStatus } from '../friends/friend.entity';
+import { FileUploadService } from '../common/file-upload/file-upload.service';
 
 @Injectable()
 export class CandidatesService {
@@ -18,14 +19,31 @@ export class CandidatesService {
 		private readonly candidateRepository: Repository<Candidate>,
 		@InjectRepository(Friend)
 		private readonly friendRepository: Repository<Friend>,
+		private readonly fileUploadService: FileUploadService,
 	) { }
 	public async getCandidates(userId: string): Promise<Candidate[]> {
 		return await this.candidateRepository.find({ where: { userId } });
 	}
 	public async create(
-		createCandidateDto: CreateCandidateDto & { userId: string },
+		createCandidateDto: CreateCandidateDto,
+		images: Express.Multer.File[],
+		userId: string,
 	): Promise<Candidate> {
-		return await this.candidateRepository.save(createCandidateDto);
+		// Save uploaded image files if provided
+		let imagePaths: string[] = [];
+		if (images && images.length > 0) {
+			imagePaths = images
+				.map((image) => this.fileUploadService.saveFile(image, 'candidates'))
+				.filter((path): path is string => path !== null);
+		}
+
+		const candidate = this.candidateRepository.create({
+			...createCandidateDto,
+			images: imagePaths.length > 0 ? imagePaths : undefined,
+			userId,
+		});
+
+		return await this.candidateRepository.save(candidate);
 	}
 	async getCandidate(id: string, userId: string): Promise<Candidate> {
 		const candidate = await this.candidateRepository.findOne({ where: { id } });
@@ -48,6 +66,19 @@ export class CandidatesService {
 	}
 	async remove(id: string, userId: string): Promise<void> {
 		const candidate = await this.getCandidate(id, userId);
+
+		// Delete associated image files
+		if (candidate.images && Array.isArray(candidate.images)) {
+			const imageArray: string[] = candidate.images as string[];
+			if (imageArray.length > 0) {
+				imageArray.forEach((imagePath: string) => {
+					if (imagePath) {
+						this.fileUploadService.deleteFile(imagePath);
+					}
+				});
+			}
+		}
+
 		await this.candidateRepository.remove(candidate);
 	}
 

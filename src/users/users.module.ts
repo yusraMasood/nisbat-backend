@@ -1,12 +1,15 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './user.entity';
+import { PasswordReset } from './password-reset.entity';
 import { Friend } from '../friends/friend.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthConfig } from '../config/auth.config';
 import { TypedConfigService } from '../config/typed-config.service';
 import { PasswordService } from './password/password.service';
+import { EmailService } from './email/email.service';
+import { FileUploadService } from '../common/file-upload/file-upload.service';
 import { UserService } from './user/user.service';
 import { AuthService } from './auth/auth.service';
 import { AuthController } from './auth/auth.controller';
@@ -17,7 +20,7 @@ import { RolesGuard } from './roles.guard';
 
 @Module({
 	imports: [
-		TypeOrmModule.forFeature([User, Friend]),
+		TypeOrmModule.forFeature([User, PasswordReset, Friend]),
 		JwtModule.registerAsync({
 			imports: [ConfigModule],
 			inject: [ConfigService],
@@ -31,6 +34,8 @@ import { RolesGuard } from './roles.guard';
 	],
 	providers: [
 		PasswordService,
+		EmailService,
+		FileUploadService,
 		UserService,
 		AuthService,
 		AuthGuard,

@@ -9,6 +9,7 @@ import { appConfigSchema } from './config/config.types';
 import { TypedConfigService } from './config/typed-config.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './users/user.entity';
+import { PasswordReset } from './users/password-reset.entity';
 import { authConfig } from './config/auth.config';
 import { usersModule } from './users/users.module';
 import { FriendsModule } from './friends/friends.module';
@@ -31,7 +32,7 @@ import { Message } from './chat/message.entity';
 			inject: [ConfigService],
 			useFactory: (configService: TypedConfigService) => ({
 				...configService.get('database'),
-				entities: [Candidate, User, Friend, Message],
+				entities: [Candidate, User, PasswordReset, Friend, Message],
 				autoLoadEntities: true,
 			}),
 		}),

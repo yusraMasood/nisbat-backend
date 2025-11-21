@@ -7,8 +7,12 @@ import {
 	Patch,
 	Post,
 	Req,
+	UploadedFiles,
 	UseGuards,
+	UseInterceptors,
+	BadRequestException,
 } from '@nestjs/common';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import { CandidatesService } from './candidates.service';
 import { CreateCandidateDto } from './create-candidate.dto';
 import { UpdateCandidateDto } from './update-candidate.dto';
@@ -24,9 +28,7 @@ export class CandidatesController {
 
 	@Get('home')
 	@UseGuards(AuthGuard)
-	async getHomeFeed(
-		@Req() req: AuthRequest,
-	): Promise<Candidate[]> {
+	async getHomeFeed(@Req() req: AuthRequest): Promise<Candidate[]> {
 		return this.candidatesService.getHomeFeed(req.user.sub);
 	}
 
@@ -35,14 +37,22 @@ export class CandidatesController {
 		return this.candidatesService.getCandidates(userId);
 	}
 	@Post()
+	@UseInterceptors(FilesInterceptor('images', 5))
 	public async create(
 		@Body() createCandidate: CreateCandidateDto,
+		@UploadedFiles() images: Express.Multer.File[],
 		@CurrentUserId() userId: string,
 	): Promise<Candidate> {
-		return await this.candidatesService.create({
-			...createCandidate,
+		// Validate maximum number of images
+		if (images && images.length > 5) {
+			throw new BadRequestException('Maximum 5 images allowed');
+		}
+
+		return await this.candidatesService.create(
+			createCandidate,
+			images || [],
 			userId,
-		});
+		);
 	}
 	@Get(':id')
 	getCandidate(

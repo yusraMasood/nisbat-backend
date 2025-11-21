@@ -11,6 +11,8 @@ import { AuthService } from './auth.service';
 import { LoginDto } from '../login.dto';
 import { CreateUserDto } from '../create-user.dto';
 import { ForgotPasswordDto } from '../forgot-password.dto';
+import { VerifyCodeDto } from '../verify-code.dto';
+import { ResetPasswordDto } from '../reset-password.dto';
 import { LoginResponse } from '../login.response';
 import { Public } from '../decorators/public.decorator';
 import { AdminResponse } from '../admin.response';
@@ -49,6 +51,29 @@ export class AuthController {
 		@Body() forgotPasswordDto: ForgotPasswordDto,
 	): Promise<{ message: string }> {
 		return this.authService.forgotPassword(forgotPasswordDto.email);
+	}
+
+	@Post('verify-code')
+	@Public()
+	async verifyCode(
+		@Body() verifyCodeDto: VerifyCodeDto,
+	): Promise<{ message: string; valid: boolean }> {
+		return this.authService.verifyCode(
+			verifyCodeDto.email,
+			verifyCodeDto.code,
+		);
+	}
+
+	@Post('reset-password')
+	@Public()
+	async resetPassword(
+		@Body() resetPasswordDto: ResetPasswordDto,
+	): Promise<{ message: string }> {
+		return this.authService.resetPassword(
+			resetPasswordDto.email,
+			resetPasswordDto.code,
+			resetPasswordDto.password,
+		);
 	}
 
 	@Get('admin')

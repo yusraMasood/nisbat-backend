@@ -13,9 +13,7 @@ export class UpdateProfileDto {
 	@IsString()
 	phone?: string;
 
-	@IsOptional()
-	@IsString()
-	profileImage?: string | null;
+	// profileImage is handled via file upload, not in DTO
 
 	@IsOptional()
 	@IsString()
@@ -49,4 +47,3 @@ export class UpdateProfileDto {
 	@IsString()
 	contactMethod?: string;
 }
-

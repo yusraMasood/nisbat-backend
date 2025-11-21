@@ -113,7 +113,53 @@
 							"host": ["{{baseUrl}}"],
 							"path": ["api", "auth", "forgot-password"]
 						},
-						"description": "Request password reset link"
+						"description": "Request password reset. Generates a 6-digit OTP code and sends it via email. The OTP expires in 15 minutes."
+					},
+					"response": []
+				},
+				{
+					"name": "Verify Code",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"yusra@gmail.com\",\n  \"code\": \"123456\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/verify-code",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "verify-code"]
+						},
+						"description": "Verify the OTP code sent to email. Checks if the code is valid and not expired. Use this before resetting password."
+					},
+					"response": []
+				},
+				{
+					"name": "Reset Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"yusra@gmail.com\",\n  \"code\": \"123456\",\n  \"password\": \"NewPassword@123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/reset-password",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "reset-password"]
+						},
+						"description": "Reset password using OTP code. Requires email, OTP code, and new password. Password must contain at least one uppercase letter, one number, and one special character, with minimum 6 characters."
 					},
 					"response": []
 				},
@@ -171,22 +217,91 @@
 								"key": "Authorization",
 								"value": "Bearer {{authToken}}",
 								"type": "text"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
 							}
 						],
 						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"fullName\": \"Yusra Masood\",\n  \"profileImage\": \"https://example.com/image.jpg\",\n  \"religion\": \"Islam\",\n  \"subReligion\": \"Sunni\",\n  \"languages\": \"Urdu, English\",\n  \"caste\": \"Example Caste\",\n  \"gender\": \"Female\",\n  \"city\": \"Lahore\",\n  \"country\": \"Pakistan\",\n  \"contactMethod\": \"phone\"\n}"
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "fullName",
+									"value": "Yusra Masood",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "email",
+									"value": "yusra@example.com",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "phone",
+									"value": "+1234567890",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "religion",
+									"value": "Islam",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "subReligion",
+									"value": "Sunni",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "languages",
+									"value": "Urdu, English",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "caste",
+									"value": "Example Caste",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "gender",
+									"value": "Female",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "city",
+									"value": "Lahore",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "country",
+									"value": "Pakistan",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "contactMethod",
+									"value": "phone",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "profileImage",
+									"type": "file",
+									"src": [],
+									"description": "Optional: Upload a new profile image (JPEG, PNG, GIF, WebP). Max 5MB. If provided, old image will be replaced."
+								}
+							]
 						},
 						"url": {
 							"raw": "{{baseUrl}}/api/users/profile",
 							"host": ["{{baseUrl}}"],
 							"path": ["api", "users", "profile"]
 						},
-						"description": "Update user profile. All fields are optional."
+						"description": "Update user profile. All fields are optional. Use multipart/form-data to upload profile image file. If profileImage file is provided, the old image will be automatically deleted and replaced."
 					},
 					"response": []
 				},
@@ -206,7 +321,7 @@
 							"host": ["{{baseUrl}}"],
 							"path": ["api", "users", "suggestions"]
 						},
-						"description": "Get list of people you can connect with (not your friends, not yourself)"
+						"description": "Get list of people you can connect with (not your friends, not yourself). Each user object includes a `status` field: 'none' (no friend request), 'pending' (you sent a request), or 'requested' (they sent you a request)."
 					},
 					"response": []
 				}
@@ -280,22 +395,161 @@
 								"key": "Authorization",
 								"value": "Bearer {{authToken}}",
 								"type": "text"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
 							}
 						],
 						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"fullName\": \"John Doe\",\n  \"image\": \"https://example.com/profile.jpg\",\n  \"gender\": \"Male\",\n  \"dob\": \"1990-01-15\",\n  \"maritalStatus\": \"Single\",\n  \"height\": \"5'10\\\"\",\n  \"religion\": \"Islam\",\n  \"caste\": \"Example Caste\",\n  \"language\": \"Urdu\",\n  \"education\": \"Bachelor's Degree\",\n  \"job\": \"Software Engineer\",\n  \"income\": \"50000-100000\",\n  \"preferredAge\": \"25-30\",\n  \"preferredHeight\": \"5'5\\\"-6'0\\\"\",\n  \"preferredEducation\": \"Bachelor's or higher\",\n  \"preferredCaste\": \"Any\",\n  \"preferredLanguage\": \"Urdu, English\",\n  \"preferredLocation\": \"Lahore, Karachi\",\n  \"otherPreferred\": \"Non-smoker, active lifestyle\"\n}"
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "fullName",
+									"value": "John Doe",
+									"type": "text"
+								},
+								{
+									"key": "gender",
+									"value": "Male",
+									"type": "text"
+								},
+								{
+									"key": "dob",
+									"value": "1990-01-15",
+									"type": "text"
+								},
+								{
+									"key": "maritalStatus",
+									"value": "Single",
+									"type": "text"
+								},
+								{
+									"key": "height",
+									"value": "5'10\"",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "religion",
+									"value": "Islam",
+									"type": "text"
+								},
+								{
+									"key": "caste",
+									"value": "Example Caste",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "language",
+									"value": "Urdu",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "education",
+									"value": "Bachelor's Degree",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "job",
+									"value": "Software Engineer",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "income",
+									"value": "50000-100000",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "preferredAge",
+									"value": "25-30",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "preferredHeight",
+									"value": "5'5\"-6'0\"",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "preferredEducation",
+									"value": "Bachelor's or higher",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "preferredCaste",
+									"value": "Any",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "preferredLanguage",
+									"value": "Urdu, English",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "preferredLocation",
+									"value": "Lahore, Karachi",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "otherPreferred",
+									"value": "Non-smoker, active lifestyle",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "status",
+									"value": "PENDING",
+									"type": "text"
+								},
+								{
+									"key": "images",
+									"type": "file",
+									"src": [],
+									"description": "Upload up to 5 images (JPEG, PNG, GIF, WebP). Each file max 5MB."
+								},
+								{
+									"key": "images",
+									"type": "file",
+									"src": [],
+									"disabled": true,
+									"description": "Optional: Second image"
+								},
+								{
+									"key": "images",
+									"type": "file",
+									"src": [],
+									"disabled": true,
+									"description": "Optional: Third image"
+								},
+								{
+									"key": "images",
+									"type": "file",
+									"src": [],
+									"disabled": true,
+									"description": "Optional: Fourth image"
+								},
+								{
+									"key": "images",
+									"type": "file",
+									"src": [],
+									"disabled": true,
+									"description": "Optional: Fifth image"
+								}
+							]
 						},
 						"url": {
 							"raw": "{{baseUrl}}/api/candidates",
 							"host": ["{{baseUrl}}"],
 							"path": ["api", "candidates"]
 						},
-						"description": "Create a new candidate"
+						"description": "Create a new candidate with file uploads. Accepts up to 5 images via multipart/form-data. The userId is automatically set from the JWT token. Status must be one of: PENDING, APPROVED, or REJECTED. Image files must be JPEG, PNG, GIF, or WebP format, max 5MB each."
 					},
 					"response": []
 				},

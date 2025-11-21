@@ -7,9 +7,11 @@ import {
 	Patch,
 	Request,
 	SerializeOptions,
+	UploadedFile,
 	UseGuards,
 	UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { UserService } from './user/user.service';
 import { User } from './user.entity';
 import type { AuthRequest } from './auth.request';
@@ -33,11 +35,17 @@ export class UsersController {
 	}
 
 	@Patch('profile')
+	@UseInterceptors(FileInterceptor('profileImage'))
 	async updateProfile(
 		@Request() request: AuthRequest,
 		@Body() updateProfileDto: UpdateProfileDto,
+		@UploadedFile() profileImage: Express.Multer.File,
 	): Promise<User> {
-		return this.userService.updateProfile(request.user.sub, updateProfileDto);
+		return this.userService.updateProfile(
+			request.user.sub,
+			updateProfileDto,
+			profileImage,
+		);
 	}
 
 	@Get('suggestions')

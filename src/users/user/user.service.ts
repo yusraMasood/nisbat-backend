@@ -11,6 +11,7 @@ import { CreateUserDto } from '../create-user.dto';
 import { UpdateProfileDto } from '../update-profile.dto';
 import { Role } from '../role.enum';
 import { Friend, FriendStatus } from '../../friends/friend.entity';
+import { FileUploadService } from '../../common/file-upload/file-upload.service';
 
 {
 	/*
@@ -27,6 +28,7 @@ export class UserService {
 		@InjectRepository(Friend)
 		private readonly friendRepository: Repository<Friend>,
 		private readonly passwordService: PasswordService,
+		private readonly fileUploadService: FileUploadService,
 	) { }
 	public async findOneByEmail(email: string): Promise<User | null> {
 		return await this.userRepository.findOneBy({ email });
@@ -57,6 +59,7 @@ export class UserService {
 	async updateProfile(
 		userId: string,
 		updateProfileDto: UpdateProfileDto,
+		profileImage?: Express.Multer.File,
 	): Promise<User> {
 		const user = await this.findOneById(userId);
 		if (!user) {
@@ -71,8 +74,50 @@ export class UserService {
 			}
 		}
 
+		// Handle profile image upload if provided
+		if (profileImage) {
+			// Delete old profile image if it exists
+			if (user.profileImage) {
+				this.fileUploadService.deleteFile(user.profileImage);
+			}
+
+			// Save new profile image
+			const imagePath = this.fileUploadService.saveFile(
+				profileImage,
+				'profiles',
+			);
+			user.profileImage = imagePath;
+		}
+
 		// Update only the fields that are provided
 		Object.assign(user, updateProfileDto);
+
+		return await this.userRepository.save(user);
+	}
+
+	async updatePassword(userId: string, newPassword: string): Promise<User> {
+		const user = await this.findOneById(userId);
+		if (!user) {
+			throw new NotFoundException('User not found');
+		}
+
+		const hashedPassword = await this.passwordService.hash(newPassword);
+		user.password = hashedPassword;
+
+		return await this.userRepository.save(user);
+	}
+
+	async updatePasswordByEmail(
+		email: string,
+		newPassword: string,
+	): Promise<User> {
+		const user = await this.findOneByEmail(email);
+		if (!user) {
+			throw new NotFoundException('User not found');
+		}
+
+		const hashedPassword = await this.passwordService.hash(newPassword);
+		user.password = hashedPassword;
 
 		return await this.userRepository.save(user);
 	}
